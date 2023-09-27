@@ -1,0 +1,47 @@
+{% extends 'mailings/base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="col-12 mb-4">
+    <h3 align="center" style="color:Black mb-4">Рассылки:</h3>
+        </div>
+        <a class="btn btn-outline-primary" href="{% url 'mailings:message_create' %}">Создать сообщение для рассылки</a>
+        <a class="btn btn-outline-primary" href="{% url 'mailings:create' %}">Создать рассылку</a>
+    </div>
+
+    <div class="row text-center">
+        {% for object in object_list %}
+        <div class="col-6">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+
+                </div>
+
+                <div class="card-body">
+
+                    <ul class="list-unstyled mt-4 mb-4 text-start m-3">
+                        <li> {{object.start_time}} | {{object.end_time}}</li>
+                        <li> Пользователь: {{object.user}}</li>
+
+                    </ul>
+
+                    <br>
+                    <div class="btn-group">
+                        {% if perms.mailings.change_mailsettings %}
+                        <a class="btn btn-outline-secondary" href="{% url 'mailings:update' object.pk %}">Редактировать</a>
+                        {% endif %}
+                        {% if perms.mailings.delete_mailsettings %}
+                        <a class="btn btn-outline-danger" href="{% url 'mailings:delete' object.pk %}">Удалить</a>
+                        {% endif %}
+                        <a class="btn btn-outline-info" href="{% url 'mailings:mail_log' object.pk %}">История</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+    {% endblock %}
