@@ -8,14 +8,25 @@ from django.shortcuts import redirect, render, Http404
 
 from mailings.forms import *
 from mailings.models import *
-from mailings.services import send_email, my_job
+from mailings.services import send_email, my_job, get_cached_data, get_random_blog
 
 
 class IndexView(TemplateView):
     template_name = 'mailings/index.html'
-    extra_context = {
-        'title': 'Главная'
-    }
+
+    def get_context_data(self):
+        total_mailings_counter = get_cached_data()[0]
+        active_mailings_counter = get_cached_data()[1]
+        unique_client_counter = get_cached_data()[2]
+        context = {
+            'title': 'Главная',
+            'total_mailings_counter': total_mailings_counter,
+            'active_mailing_counter': active_mailings_counter,
+            'unique_client_counter': unique_client_counter,
+            'random_blog': get_random_blog(),
+        }
+        print(context)
+        return context
 
 
 class ContactFormView(FormView):
@@ -37,6 +48,13 @@ class ContactFormView(FormView):
 class ClientListView(LoginRequiredMixin, ListView):
     model = Client
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff and not self.request.user.is_superuser:
+            queryset = queryset.filter(user=self.request.user)
+
+        return queryset
+
 
 class ClientCreateView(LoginRequiredMixin, CreateView):
     model = Client
@@ -55,6 +73,11 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ClientForm
     success_url = reverse_lazy('mailings:clients')
 
+    def form_valid(self, form):
+        if not self.request.user.is_staff or not self.request.user.is_superuser:
+            form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
     model = Client
@@ -66,7 +89,7 @@ class MailSettingsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not self.request.user.is_staff:
+        if not self.request.user.is_staff or not self.request.user.is_superuser:
             queryset = super().get_queryset().filter(user=self.request.user)
         return queryset
 
@@ -75,6 +98,19 @@ class MailSettingsCreateView(LoginRequiredMixin, CreateView):
     model = MailSettings
     form_class = MailSettingsForm
     success_url = reverse_lazy('mailings:list')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = super().get_queryset().filter(user=self.request.user)
+        return queryset
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        form.fields['client'].queryset = Client.objects.filter(user=self.request.user)
+
+        return form
 
     def form_valid(self, form):
         self.object = form.save()
@@ -151,5 +187,3 @@ class MailingLogListView(LoginRequiredMixin, ListView):
         context_data = super().get_context_data(**kwargs)
         context_data['mailings'] = MailSettings.objects.get(pk=self.kwargs.get('pk'))
         return context_data
-
-

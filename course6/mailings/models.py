@@ -46,7 +46,8 @@ class MailSettings(models.Model):
     end_time = models.DateTimeField(verbose_name='Время окончания', **NULLABLE)
     period = models.CharField(max_length=50, choices=PERIOD_CHOICES, verbose_name='Периодичность рассылки')
     client = models.ManyToManyField(Client, related_name="get_client", verbose_name='Клиент')
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='create', verbose_name='Статус рассылки')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='in_process', verbose_name='Статус '
+                                                                                                        'рассылки')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE, related_name='create_mail', verbose_name='Добавил рассылку')
 
     class Meta:
@@ -66,18 +67,6 @@ class Message(models.Model):
         verbose_name_plural = 'сообщения'
 
 
-class MailClient(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name='клиент')
-    settings = models.ForeignKey(MailSettings, on_delete=models.CASCADE, verbose_name='настройки')
-
-    def __str__(self):
-        return f"{self.client} / {self.settings}"
-
-    class Meta:
-        verbose_name = 'Клиент рассылки'
-        verbose_name_plural = 'Клиенты рассылки'
-
-
 class Logs(models.Model):
     STATUS_SUCCESS = 'success'
     STATUS_FAILED = 'failed'
@@ -88,7 +77,7 @@ class Logs(models.Model):
 
     last_try = models.DateTimeField(auto_now_add=True, verbose_name='дата последней попытки')
     status = models.CharField(choices=STATUSES, default=STATUS_SUCCESS, verbose_name='статус')
-    answer_server = models.TextField(verbose_name='ответ сервера')
+    answer_server = models.TextField(verbose_name='ответ сервера', **NULLABLE)
     mailings = models.ForeignKey(MailSettings, on_delete=models.CASCADE, related_name="get_log",
                                  verbose_name='рассылка')
 

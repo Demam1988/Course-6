@@ -61,7 +61,7 @@ class MailSettingsForm(FormMixin, forms.ModelForm):
 
 class MailSettingsChangeStatus(FormMixin, forms.ModelForm):
     """
-    Форма для изменения статуса рассылки, нужна для группы пользователей 'менеджер'
+    Форма для изменения статуса рассылки
     """
 
     class Meta:

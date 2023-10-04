@@ -1,8 +1,8 @@
 from django.core.management import BaseCommand
-from mailings.services import send_mails
+from mailings.services import my_job
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        send_mails()
+        my_job()

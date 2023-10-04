@@ -1,10 +1,14 @@
+import random
 from datetime import datetime, timezone
 from smtplib import SMTPException
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.utils import timezone
+from django.core.cache import cache
 
-from mailings.models import Logs, MailSettings
+from mailings.models import Logs, MailSettings, Client
+from blog.models import Article
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,14 +22,14 @@ def send_email(mail_settings):
     status = Logs.STATUS_FAILED
 
     try:
-        letter = send_mail(
+        result = send_mail(
             subject=mail_settings.message.title,
             message=mail_settings.message.message,
             from_email=settings.EMAIL_HOST_USER,
             recipient_list=clients_list,
         )
 
-        if letter:
+        if result:
             status = Logs.STATUS_SUCCESS
             server_response = "Рассылка отправлена успешно"
 
@@ -43,38 +47,68 @@ def send_email(mail_settings):
         mailings=mail_settings,
         answer_server=server_response
     )
-    print(mail_settings)
 
 
 def my_job():
-    now = datetime.now().timestamp()
-    print("вызвали")
-
+    now = timezone.now()
+    print('Меня вызвали', now)
     for mail_settings in MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS):
-        if (now > mail_settings.start_time.timestamp()) and (now < mail_settings.end_time.timestamp()):
-            print('Попадаем в период')
-            for mail_client in mail_settings.client.all():
-                print(mail_client)
-                mailing_log = Logs.objects.filter(mailings=mail_settings)
+        if (now.timestamp() > mail_settings.start_time.timestamp()) and (
+                now.timestamp() < mail_settings.end_time.timestamp()):
+            mail_log = Logs.objects.filter(mailings=mail_settings)
+            if mail_log.exists():
 
-                if mailing_log.exists():
-                    print('log exists')
-                    last_try_date = mailing_log.order_by('-last_try').first().last_try
-                    mail_period = mailing_log[0]
-                    print(mail_period)
+                last_try_date = mail_log.order_by('-last_try').first().last_try
+                mail_period = mail_settings.period
+                print('Mail log exists, last_try -', last_try_date)
+                print((now - last_try_date).days)
+                if mail_period == MailSettings.PERIOD_DAILY:
+                    if (now - last_try_date).days >= 1:
+                        print('send email')
+                        send_email(mail_settings)
+                elif mail_period == MailSettings.PERIOD_WEEKLY:
+                    if (now - last_try_date).days >= 7:
+                        send_email(mail_settings)
+                elif mail_period == MailSettings.PERIOD_MONTHLY:
+                    if (now - last_try_date).days >= 30:
+                        send_email(mail_settings)
+            else:
+                print('log does not exist')
+                send_email(mail_settings)
 
-                    if mail_period == MailSettings.PERIOD_DAILY:
-                        print('dayly')
-                        if (now - last_try_date).days >= 1:
-                            send_email(mail_settings)
-                    elif mail_period == MailSettings.PERIOD_WEEKLY:
-                        print('weekly')
-                        if (now - last_try_date).days >= 7:
-                            send_email(mail_settings)
-                    elif mail_period == MailSettings.PERIOD_MONTHLY:
-                        print('monthly')
-                        if (now - last_try_date).days >= 30:
-                            send_email(mail_settings)
-                else:
-                    print('no logs')
-                    send_email(mail_settings)
+
+def get_cached_data():
+    if settings.CACHE_ENABLED:
+
+        total_mailings_counter = cache.get('total_mailings_counter')
+        active_mailings_counter = cache.get('active_mailings_counter')
+        unique_client_counter = cache.get('unique_client_counter')
+
+        if total_mailings_counter is None:
+            total_mailings_counter = MailSettings.objects.all()
+            cache.get('total_mailings_counter', total_mailings_counter)
+        else:
+            total_mailings_counter = MailSettings.objects.all()
+
+        if active_mailings_counter is None:
+            active_mailings_counter = MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS)
+            cache.get('active_mailings_counter', active_mailings_counter)
+        else:
+            active_mailings_counter = MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS)
+
+        if unique_client_counter is None:
+            unique_client_counter = Client.objects.all().distinct('email')
+            cache.get('unique_client_counter', unique_client_counter)
+        else:
+            unique_client_counter = Client.objects.all().distinct('email')
+
+    return len(total_mailings_counter), len(active_mailings_counter), len(unique_client_counter)
+
+
+def get_random_blog():
+    items = list(Article.objects.all())
+    if len(items) < 3:
+        random_items = random.sample(items, len(items))
+    else:
+        random_items = random.sample(items, 3)
+    return random_items
