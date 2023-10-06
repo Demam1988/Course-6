@@ -1,17 +1,16 @@
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, TemplateView, FormView
+from django.views.generic import ListView, UpdateView, DeleteView, CreateView, TemplateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.urls import reverse_lazy, reverse
-from django.shortcuts import redirect, render, Http404
+from django.urls import reverse_lazy
+from django.shortcuts import redirect, Http404
 
 from mailings.forms import *
 from mailings.models import *
-from mailings.services import send_email, my_job, get_cached_data, get_random_blog
+from mailings.services import my_job, get_cached_data, get_random_blog
 
 
 class IndexView(TemplateView):
+    """ Главная страница """
+
     template_name = 'mailings/index.html'
 
     def get_context_data(self):
@@ -25,11 +24,13 @@ class IndexView(TemplateView):
             'unique_client_counter': unique_client_counter,
             'random_blog': get_random_blog(),
         }
-        print(context)
+
         return context
 
 
 class ContactFormView(FormView):
+    """ Контактная информация и отправка сообщения """
+
     form_class = ContactForm
     template_name = 'mailings/contact.html'
     success_url = reverse_lazy('/')
@@ -45,18 +46,23 @@ class ContactFormView(FormView):
         return redirect('/')
 
 
+#################################################################################
 class ClientListView(LoginRequiredMixin, ListView):
+    """ Список клиентов, доступны к просмотру клиенты, созданные пользователем """
+
     model = Client
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not self.request.user.is_staff and not self.request.user.is_superuser:
+        if not self.request.user.is_staff or not self.request.user.is_superuser:
             queryset = queryset.filter(user=self.request.user)
 
         return queryset
 
 
 class ClientCreateView(LoginRequiredMixin, CreateView):
+    """ Создание клиента """
+
     model = Client
     form_class = ClientForm
     success_url = reverse_lazy('mailings:clients')
@@ -69,6 +75,8 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
 
 
 class ClientUpdateView(LoginRequiredMixin, UpdateView):
+    """ Редактирование клиента, доступны к редактированию клиенты, созданные пользователем """
+
     model = Client
     form_class = ClientForm
     success_url = reverse_lazy('mailings:clients')
@@ -80,11 +88,16 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
+    """ Удаление клиента, доступны к удалению клиенты, созданные пользователем """
+
     model = Client
     success_url = reverse_lazy('mailings:clients')
 
 
+#################################################################################
 class MailSettingsListView(LoginRequiredMixin, ListView):
+    """ Список рассылок, созданных пользователем """
+
     model = MailSettings
 
     def get_queryset(self):
@@ -95,21 +108,18 @@ class MailSettingsListView(LoginRequiredMixin, ListView):
 
 
 class MailSettingsCreateView(LoginRequiredMixin, CreateView):
+    """ Создание рассылки """
+
     model = MailSettings
     form_class = MailSettingsForm
     success_url = reverse_lazy('mailings:list')
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        if not self.request.user.is_staff:
-            queryset = super().get_queryset().filter(user=self.request.user)
-        return queryset
-
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-
-        form.fields['client'].queryset = Client.objects.filter(user=self.request.user)
-
+        if not self.request.user.is_superuser:
+            form.fields['client'].queryset = Client.objects.filter(user=self.request.user)
+        else:
+            form.fields['client'].queryset = Client.objects.all()
         return form
 
     def form_valid(self, form):
@@ -122,6 +132,8 @@ class MailSettingsCreateView(LoginRequiredMixin, CreateView):
 
 
 class MailSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """ Редактирование рассылки, доступны к редактированию рассылки, созданные пользователем """
+
     model = MailSettings
     form_class = MailSettingsForm
     permission_required = 'mailings.change_mailsettings'
@@ -136,6 +148,8 @@ class MailSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
 
 
 class MailSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """ Удаление рассылки """
+
     model = MailSettings
     permission_required = 'mailings.delete_mailsettings'
     success_url = reverse_lazy('mailings:list')
@@ -143,39 +157,53 @@ class MailSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Delete
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(*args, **kwargs)
         context_data['clients'] = Client.objects.all()
-        context_data['mailings_pk'] = self.kwargs.get('pk')
+        context_data['mail_pk'] = self.kwargs.get('pk')
 
         return context_data
 
 
+class StatusMailingSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = MailSettings
+    form_class = MailSettingsChangeStatus
+    success_url = reverse_lazy('mailings:list')
+    permission_required = 'mailings.set_status'
+
+
+#################################################################################
 class MessageListView(LoginRequiredMixin, ListView):
+    """ Список сообщений, доступно для использования всем """
+
     model = Message
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
+    """ Создание сообщения для рассылок """
+
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('mailings:message_list')
 
 
 class MessageUpdateView(LoginRequiredMixin, UpdateView):
+    """ Редактирование сообщения для рассылок """
+
     model = Message
     form_class = MessageForm
-    # permission_required = 'mailings.change_mailmessage'
+    permission_required = 'mail.change_message'
     success_url = reverse_lazy('mailings:message_list')
 
 
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
+    """ Удаление сообщения для рассылок """
+
     model = Message
     success_url = reverse_lazy('mailings:message_list')
 
 
-class MessageDetailView(LoginRequiredMixin, DetailView):
-    model = Message
-    pk_url_kwarg = 'pk'
-
-
+#################################################################################
 class MailingLogListView(LoginRequiredMixin, ListView):
+    """ Список логов по рассылке """
+
     model = Logs
 
     def get_queryset(self, *args, **kwargs):

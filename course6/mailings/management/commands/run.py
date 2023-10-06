@@ -1,25 +1,24 @@
-from apscheduler.schedulers.blocking import BlockingScheduler
+from time import sleep
+import os
+
+from django.core.management import BaseCommand
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from mailings.services import my_job
 
-scheduler = BlockingScheduler()
+scheduler = BackgroundScheduler()
 
 scheduler.add_job(my_job, 'interval', seconds=30)
 
-scheduler.start()
-# from apscheduler.schedulers.background import BackgroundScheduler
-#
-# from mailings.services import my_job
-#
-# scheduler = BackgroundScheduler()
-# job = None
 
+class Command(BaseCommand):
 
-def start_job():
-    global job
-    job = scheduler.add_job(my_job, 'interval', seconds=3600)
-    try:
+    def handle(self, *args, **options):
         scheduler.start()
-    except:
-        pass
+        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+        try:
+            while True:
+                sleep(1)
+        except (KeyboardInterrupt, SystemExit):
+            scheduler.shutdown(wait=False)
+        print("END.", flush=True)

@@ -1,5 +1,5 @@
 import random
-from datetime import datetime, timezone
+from datetime import timezone
 from smtplib import SMTPException
 
 from django.conf import settings
@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 def send_email(mail_settings):
+    """ Отправка рассылки """
+
     clients = mail_settings.client.all()
     clients_list = [client.email for client in clients]
 
@@ -31,16 +33,10 @@ def send_email(mail_settings):
 
         if result:
             status = Logs.STATUS_SUCCESS
-            server_response = "Рассылка отправлена успешно"
+            server_response = "OK"
 
     except SMTPException as e:
         server_response = str(e)
-        logger.error(f"SMTPException occurred: {e}")
-    else:
-        logger.info("Рассылка отправлена успешно")
-
-    if server_response:
-        logger.info(f"Server response: {server_response}")
 
     Logs.objects.create(
         status=status,
@@ -50,8 +46,9 @@ def send_email(mail_settings):
 
 
 def my_job():
+    """ Проверяет необходима ли рассылка почты """
+
     now = timezone.now()
-    print('Меня вызвали', now)
     for mail_settings in MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS):
         if (now.timestamp() > mail_settings.start_time.timestamp()) and (
                 now.timestamp() < mail_settings.end_time.timestamp()):
@@ -60,11 +57,8 @@ def my_job():
 
                 last_try_date = mail_log.order_by('-last_try').first().last_try
                 mail_period = mail_settings.period
-                print('Mail log exists, last_try -', last_try_date)
-                print((now - last_try_date).days)
                 if mail_period == MailSettings.PERIOD_DAILY:
                     if (now - last_try_date).days >= 1:
-                        print('send email')
                         send_email(mail_settings)
                 elif mail_period == MailSettings.PERIOD_WEEKLY:
                     if (now - last_try_date).days >= 7:
@@ -73,13 +67,13 @@ def my_job():
                     if (now - last_try_date).days >= 30:
                         send_email(mail_settings)
             else:
-                print('log does not exist')
                 send_email(mail_settings)
 
 
 def get_cached_data():
-    if settings.CACHE_ENABLED:
+    """ Кэширование для главной страницы (всего рассылок, активные рассылки, уникальные клиенты """
 
+    if settings.CACHE_ENABLED:
         total_mailings_counter = cache.get('total_mailings_counter')
         active_mailings_counter = cache.get('active_mailings_counter')
         unique_client_counter = cache.get('unique_client_counter')
@@ -106,6 +100,8 @@ def get_cached_data():
 
 
 def get_random_blog():
+    """ Получает 3 статьи рандомно """
+
     items = list(Article.objects.all())
     if len(items) < 3:
         random_items = random.sample(items, len(items))

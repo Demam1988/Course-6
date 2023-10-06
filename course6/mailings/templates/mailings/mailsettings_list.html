@@ -30,12 +30,8 @@
 
                     <br>
                     <div class="btn-group">
-                        {% if perms.mailings.change_mailsettings %}
                         <a class="btn btn-outline-secondary" href="{% url 'mailings:update' object.pk %}">Редактировать</a>
-                        {% endif %}
-                        {% if perms.mailings.delete_mailsettings %}
                         <a class="btn btn-outline-danger" href="{% url 'mailings:delete' object.pk %}">Удалить</a>
-                        {% endif %}
                         <a class="btn btn-outline-info" href="{% url 'mailings:mail_log' object.pk %}">История</a>
                     </div>
                 </div>

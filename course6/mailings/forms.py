@@ -49,7 +49,7 @@ class MailSettingsForm(FormMixin, forms.ModelForm):
 
     class Meta:
         model = MailSettings
-        exclude = ('user',)
+        exclude = ('user', 'status')
         help_texts = {'start_time': "Дата и время в формате: ДД.ММ.ГГГГ ЧЧ:ММ",
                       'end_time': "Дата и время в формате: ДД.ММ.ГГГГ ЧЧ:ММ",
                       }
