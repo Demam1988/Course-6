@@ -14,6 +14,8 @@ urlpatterns = [
     path('verification/<str:key>/', verify_email_view, name='verification'),
     path('letter_sending/', LetterSending.as_view(), name='letter_sending'),
     path('forgot_password/', password_reset_view, name='password_reset'),
+    path('user_list/', UserListView.as_view(), name='user_list'),
+    path('users_activity/<int:pk>/', UserUpdateView.as_view(), name='users_activity'),
 
 
 ]

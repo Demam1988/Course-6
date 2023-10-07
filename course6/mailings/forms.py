@@ -66,7 +66,7 @@ class MailSettingsChangeStatus(FormMixin, forms.ModelForm):
 
     class Meta:
         model = MailSettings
-        fields = ('message', 'status',)
+        fields = ('status',)
 
 
 

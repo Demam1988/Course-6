@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'mailings',
     'users',
     'blog',
-    'scheduler_app'
 
 ]
 SITE_ID = 1

@@ -1,8 +1,9 @@
 import random
 
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, FormView, TemplateView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView, ListView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 
 from .models import User
 from .forms import UserRegisterForm, UserProfileForm
@@ -46,6 +47,25 @@ class ProfileView(UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = User
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get_queryset(self):
+        queryset = User.objects.filter(is_staff=False)
+        return queryset
+
+
+class UserUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = User
+    template_name = 'users/user_form.html'
+    success_url = reverse_lazy('users:user_list')
+    permission_required = 'users.set_is_active'
+    fields = ['is_active', ]
 
 
 def verify_email_view(request, key):

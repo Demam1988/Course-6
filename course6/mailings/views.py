@@ -22,7 +22,7 @@ class IndexView(TemplateView):
             'total_mailings_counter': total_mailings_counter,
             'active_mailing_counter': active_mailings_counter,
             'unique_client_counter': unique_client_counter,
-            'random_blog': get_random_blog(),
+            'random_blog': get_random_blog() if get_random_blog() else [],
         }
 
         return context
@@ -54,7 +54,7 @@ class ClientListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not self.request.user.is_staff or not self.request.user.is_superuser:
+        if not self.request.user.is_staff:
             queryset = queryset.filter(user=self.request.user)
 
         return queryset
@@ -102,16 +102,17 @@ class MailSettingsListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if not self.request.user.is_staff or not self.request.user.is_superuser:
+        if not self.request.user.is_staff:
             queryset = super().get_queryset().filter(user=self.request.user)
         return queryset
 
 
-class MailSettingsCreateView(LoginRequiredMixin, CreateView):
+class MailSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """ Создание рассылки """
 
     model = MailSettings
     form_class = MailSettingsForm
+    permission_required = 'mailings.add_mailsettings'
     success_url = reverse_lazy('mailings:list')
 
     def get_form(self, form_class=None):
@@ -184,19 +185,20 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('mailings:message_list')
 
 
-class MessageUpdateView(LoginRequiredMixin, UpdateView):
+class MessageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """ Редактирование сообщения для рассылок """
 
     model = Message
     form_class = MessageForm
-    permission_required = 'mail.change_message'
+    permission_required = 'mailings.change_message'
     success_url = reverse_lazy('mailings:message_list')
 
 
-class MessageDeleteView(LoginRequiredMixin, DeleteView):
+class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """ Удаление сообщения для рассылок """
 
     model = Message
+    permission_required = 'mailings.delete_message'
     success_url = reverse_lazy('mailings:message_list')
 
 

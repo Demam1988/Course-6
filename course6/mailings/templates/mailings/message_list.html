@@ -3,9 +3,11 @@
 
 <div class="container">
     <div class="col-12 mb-4">
-    <h3 align="center" style="color:Black mb-4">Сообщения:</h3>
+    <h3 align="center" style="color:Black mb-4">Сообщения для использования в рассылках:</h3>
+        {% if perms.mailings.add_mailsettings %}
+            <a class="btn btn-outline-primary" href="{% url 'mailings:create' %}">Создать рассылку</a>
+        {% endif %}
         <a class="btn btn-outline-primary" href="{% url 'mailings:message_create' %}">Создать сообщение</a>
-        <a class="btn btn-outline-primary" href="{% url 'mailings:create' %}">Создать рассылку</a>
     </div>
     <div class="row text-center">
         {% for object in object_list %}
@@ -22,8 +24,10 @@
                     </ul>
                     <br>
                     <div class="btn-group">
-                        <a class="btn btn-outline-secondary" href="{% url 'mailings:message_update' object.pk %}">Редактировать</a>
-                        <a class="btn btn-outline-danger" href="{% url 'mailings:message_delete' object.pk %}">Удалить</a>
+                        {% if perms.mailings.change_message %}
+                            <a class="btn btn-outline-secondary" href="{% url 'mailings:message_update' object.pk %}">Редактировать</a>
+                            <a class="btn btn-outline-danger" href="{% url 'mailings:message_delete' object.pk %}">Удалить</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

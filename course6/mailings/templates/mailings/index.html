@@ -44,7 +44,9 @@
         </div>
     </div>
         <h3 align="center" style="color:Black mb-4">Кое-что из блога:</h3>
+
     {% for object in object_list %}
+
 
     <div class="card mb-4 box-shadow">
         <div class="card-header">
@@ -72,7 +74,9 @@
 </div>
 <div class="container">
     <div class="row">
+
         {% for object in random_blog %}
+
         <div class="card mb-4 box-shadow">
             <div class="card-header">
                 <h4 class="my-0 font-weight-normal">"{{ object.title|title }}" </h4>
@@ -94,9 +98,11 @@
             </div>
 
         </div>
+
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}
 
 </div>

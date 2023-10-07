@@ -19,8 +19,8 @@ urlpatterns = [
     path('update/<int:pk>', MailSettingsUpdateView.as_view(), name='update'),
     path('delete/<int:pk>', MailSettingsDeleteView.as_view(), name='delete'),
 
-    path('mail_settings_status_update/<int:pk>/', StatusMailingSettingsUpdateView.as_view(),
-         name='mail_settings_status_update'),
+    path('status_update/<int:pk>/', StatusMailingSettingsUpdateView.as_view(),
+         name='status_update'),
 
     path('mailing_log/<int:pk>/', MailingLogListView.as_view(), name='mail_log'),
 
