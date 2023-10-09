@@ -43,7 +43,7 @@ password: 12345**
 
 login: manager@test.com
 password: user12345.
-Для всех пользователей password: user12345.
+Для всех пользователей (user1@test.com, user2@test.com) password: user12345.
 
 Для запуска планировщика apscheduler используйте команду: python manage.py run
 Остановка планировщика: ctrl + break
