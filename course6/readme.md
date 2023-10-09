@@ -27,10 +27,20 @@
 Установите Redis (используется для кэширования).
 
 Команды:
+
 Для наполнения блога используйте команду: python manage.py loaddata blog.json
-Для добавления групп используйте команду: python manage.py loaddata group.json
+Для добавления групп используйте команду: python manage.py loaddata groupe.json
 Для добавления пользователей используйте команду: python manage.py loaddata users.json
 
+Пароль и логин для суперпользователя:
+
+login: admin@admin.com
+password: 12345 
+
+Пароль и логин для менеджера
+
+login: manager@test.com
+password: user12345.
 Для запуска планировщика apscheduler используйте команду: python manage.py run
 Остановка планировщика: ctrl + break
 Для запуска рассылки из командной строки используйте команду: python manage.py send

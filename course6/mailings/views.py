@@ -82,7 +82,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('mailings:clients')
 
     def form_valid(self, form):
-        if not self.request.user.is_staff or not self.request.user.is_superuser:
+        if not self.request.user.is_staff:
             form.instance.user = self.request.user
         return super().form_valid(form)
 
