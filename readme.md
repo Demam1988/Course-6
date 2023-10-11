@@ -37,12 +37,13 @@
 Пароль и логин для суперпользователя:
 
 login: admin@admin.com
-password: 12345** 
+password: 12345
 
 Пароль и логин для менеджера
 
 login: manager@test.com
 password: user12345.
+Для всех пользователей (user1@test.com, user2@test.com) password: user12345.
 
 Для запуска планировщика apscheduler используйте команду: python manage.py run
 Остановка планировщика: ctrl + break
