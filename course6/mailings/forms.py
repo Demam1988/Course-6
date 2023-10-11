@@ -1,7 +1,6 @@
 from django import forms
-from django.forms.widgets import NumberInput
 
-from mailings.models import *
+from mailings.models import Message, Client, MailSettings
 
 
 class FormMixin:

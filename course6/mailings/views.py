@@ -3,8 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, Http404
 
-from mailings.forms import *
-from mailings.models import *
+from mailings.forms import ContactForm, ClientForm, MailSettingsForm, MailSettingsChangeStatus, MessageForm
+from mailings.models import Client, MailSettings, Message, Logs
 from mailings.services import my_job, get_cached_data, get_random_blog
 
 
