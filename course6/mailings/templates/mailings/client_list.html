@@ -6,7 +6,8 @@
 <div class="container">
     <div class="col-12 mb-4">
         <h3 align="center" style="color:Black mb-4">Клиенты:</h3>
-        <a class="btn btn-outline-primary" href="{% url 'mailings:client_create' %}">Добавить клиента</a>
+        <a class="btn btn-outline-primary"
+           href="{% url 'mailings:client_create' %}">Добавить клиента</a>
     </div>
 
     <div class="row text-center">
@@ -16,17 +17,21 @@
                 <div class="card-header"></div>
                 <div class="card-body">
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <li> ФИО: {{object.first_name}} {{object.last_name|first}}.{{object.surname|first}}.</li>
+                        <li> ФИО: {{object.first_name}}
+                            {{object.last_name|first}}.{{object.surname|first}}.
+                        </li>
                         <li>{{object.email}}</li>
                     </ul>
                     <br>
                     <div class="btn-group">
-                        <a class="btn btn-outline-secondary" href="{% url 'mailings:client_update' object.pk %}">Редактировать</a>
+                        <a class="btn btn-outline-secondary"
+                           href="{% url 'mailings:client_update' object.pk %}">Редактировать</a>
                         <a class="btn btn-outline-danger"
                            href="{% url 'mailings:client_delete' object.pk %}">Удалить</a>
                     </div>
                     <div class="card-footer m-2">
-                        <p class="text-sm-start">Добавил клиента: {{object.user|default:"-"}}</p>
+                        <p class="text-sm-start">Добавил клиента:
+                            {{object.user|default:"-"}}</p>
                     </div>
                 </div>
             </div>

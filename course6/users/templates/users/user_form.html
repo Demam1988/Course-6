@@ -1,7 +1,7 @@
 {% extends 'mailings/base.html' %}
 
 {% block content %}
-    <div class="row">
+<div class="row">
     <div class="col-3"></div>
     <div class="col-6">
         <div class="card">
@@ -13,10 +13,11 @@
                     {% csrf_token %}
                     {{form.errors}}
                     {{ form.as_p }}
-                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    <button type="submit" class="btn btn-success">Сохранить
+                    </button>
                 </form>
             </div>
         </div>
     </div>
-    </div>
+</div>
 {% endblock %}

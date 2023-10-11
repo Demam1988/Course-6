@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -14,13 +13,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Article',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=250, verbose_name='Заголовок')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True,
+                                           serialize=False,
+                                           verbose_name='ID')),
+                ('title',
+                 models.CharField(max_length=250, verbose_name='Заголовок')),
                 ('body', models.TextField(verbose_name='Содержимое')),
-                ('date_create', models.DateField(auto_now_add=True, verbose_name='Дата создания')),
-                ('preview', models.ImageField(blank=True, null=True, upload_to='blog/', verbose_name='Изображение')),
-                ('is_published', models.BooleanField(default=True, verbose_name='Опубликована или нет')),
-                ('views_count', models.IntegerField(default=0, verbose_name='Количество просмотров')),
+                ('date_create', models.DateField(auto_now_add=True,
+                                                 verbose_name='Дата создания')),
+                ('preview',
+                 models.ImageField(blank=True, null=True, upload_to='blog/',
+                                   verbose_name='Изображение')),
+                ('is_published', models.BooleanField(default=True,
+                                                     verbose_name='Опубликована или нет')),
+                ('views_count', models.IntegerField(default=0,
+                                                    verbose_name='Количество просмотров')),
             ],
             options={
                 'verbose_name': 'статья',
