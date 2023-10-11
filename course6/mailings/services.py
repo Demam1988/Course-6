@@ -1,5 +1,4 @@
 import random
-from datetime import timezone
 from smtplib import SMTPException
 
 from django.conf import settings
@@ -49,7 +48,8 @@ def my_job():
     """ Проверяет необходима ли рассылка почты """
 
     now = timezone.now()
-    for mail_settings in MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS):
+    for mail_settings in MailSettings.objects.filter(
+            status=MailSettings.STATUS_IN_PROCESS):
         if (now.timestamp() > mail_settings.start_time.timestamp()) and (
                 now.timestamp() < mail_settings.end_time.timestamp()):
             mail_log = Logs.objects.filter(mailings=mail_settings)
@@ -71,7 +71,8 @@ def my_job():
 
 
 def get_cached_data():
-    """ Кэширование для главной страницы (всего рассылок, активные рассылки, уникальные клиенты """
+    """ Кэширование для главной страницы (всего рассылок, активные рассылки,
+    уникальные клиенты"""
 
     if settings.CACHE_ENABLED:
         total_mailings_counter = cache.get('total_mailings_counter')
@@ -85,10 +86,12 @@ def get_cached_data():
             total_mailings_counter = MailSettings.objects.all()
 
         if active_mailings_counter is None:
-            active_mailings_counter = MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS)
+            active_mailings_counter = MailSettings.objects.filter(
+                status=MailSettings.STATUS_IN_PROCESS)
             cache.get('active_mailings_counter', active_mailings_counter)
         else:
-            active_mailings_counter = MailSettings.objects.filter(status=MailSettings.STATUS_IN_PROCESS)
+            active_mailings_counter = MailSettings.objects.filter(
+                status=MailSettings.STATUS_IN_PROCESS)
 
         if unique_client_counter is None:
             unique_client_counter = Client.objects.all().distinct('email')
@@ -96,7 +99,8 @@ def get_cached_data():
         else:
             unique_client_counter = Client.objects.all().distinct('email')
 
-    return len(total_mailings_counter), len(active_mailings_counter), len(unique_client_counter)
+    return len(total_mailings_counter), len(active_mailings_counter), len(
+        unique_client_counter)
 
 
 def get_random_blog():

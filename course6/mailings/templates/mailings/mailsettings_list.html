@@ -7,10 +7,12 @@
     <div class="col-12 mb-4">
         <h3 align="center" style="color:Black mb-4">Рассылки:</h3>
     </div>
-    <a class="btn btn-outline-primary mb-4" href="{% url 'mailings:message_create' %}">Создать сообщение для
+    <a class="btn btn-outline-primary mb-4"
+       href="{% url 'mailings:message_create' %}">Создать сообщение для
         рассылки</a>
     {% if perms.mailings.add_mailsettings %}
-        <a class="btn btn-outline-primary mb-4" href="{% url 'mailings:create' %}">Создать рассылку</a>
+    <a class="btn btn-outline-primary mb-4" href="{% url 'mailings:create' %}">Создать
+        рассылку</a>
     {% endif %}
 </div>
 
@@ -30,14 +32,18 @@
                 <br>
                 <div class="btn-group">
                     {% if perms.mailings.change_mailsettings %}
-                        <a class="btn btn-outline-secondary" href="{% url 'mailings:update' object.pk %}">Редактировать</a>
+                    <a class="btn btn-outline-secondary"
+                       href="{% url 'mailings:update' object.pk %}">Редактировать</a>
                     {% endif %}
                     {% if perms.mailings.delete_mailsettings %}
-                        <a class="btn btn-outline-danger" href="{% url 'mailings:delete' object.pk %}">Удалить</a>
+                    <a class="btn btn-outline-danger"
+                       href="{% url 'mailings:delete' object.pk %}">Удалить</a>
                     {% endif %}
-                    <a class="btn btn-outline-info" href="{% url 'mailings:mail_log' object.pk %}">История</a>
+                    <a class="btn btn-outline-info"
+                       href="{% url 'mailings:mail_log' object.pk %}">История</a>
                     {% if perms.mailings.set_status %}
-                        <a class="btn btn-outline-info" href="{% url 'mailings:status_update' object.pk %}">Изменить
+                    <a class="btn btn-outline-info"
+                       href="{% url 'mailings:status_update' object.pk %}">Изменить
                         статус</a>
                     {% endif %}
                 </div>

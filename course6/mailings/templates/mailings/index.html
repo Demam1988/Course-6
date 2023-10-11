@@ -7,11 +7,13 @@
         <div class="col-4">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Всего рассылок в нашем сервисе:</h4>
+                    <h4 class="my-0 font-weight-normal">Всего рассылок в нашем
+                        сервисе:</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <h1 class="text-center">{{ total_mailings_counter }}</h1>
+                        <h1 class="text-center">{{ total_mailings_counter
+                            }}</h1>
                     </ul>
                 </div>
             </div>
@@ -20,11 +22,13 @@
         <div class="col-4">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Количество активных рассылок в нашем сервисе:</h4>
+                    <h4 class="my-0 font-weight-normal">Количество активных
+                        рассылок в нашем сервисе:</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
-                        <h1 class="text-center">{{ active_mailing_counter }}</h1>
+                        <h1 class="text-center">{{ active_mailing_counter
+                            }}</h1>
                     </ul>
                 </div>
             </div>
@@ -33,7 +37,8 @@
         <div class="col-4">
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Количество уникальных клиентов для рассылок:</h4>
+                    <h4 class="my-0 font-weight-normal">Количество уникальных
+                        клиентов для рассылок:</h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled mt-3 mb-4 text-start m-3">
@@ -43,7 +48,7 @@
             </div>
         </div>
     </div>
-        <h3 align="center" style="color:Black mb-4">Кое-что из блога:</h3>
+    <h3 align="center" style="color:Black mb-4">Кое-что из блога:</h3>
 
     {% for object in object_list %}
 
@@ -79,7 +84,8 @@
 
         <div class="card mb-4 box-shadow">
             <div class="card-header">
-                <h4 class="my-0 font-weight-normal">"{{ object.title|title }}" </h4>
+                <h4 class="my-0 font-weight-normal">"{{ object.title|title
+                    }}" </h4>
             </div>
             <div class="card-body">
                 <p>{{ object.body | truncatechars:100 }}</p>

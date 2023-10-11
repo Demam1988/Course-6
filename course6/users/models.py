@@ -8,8 +8,10 @@ class User(AbstractUser):
     username = None
 
     email = models.EmailField(unique=True, verbose_name='Email')
-    phone = models.CharField(max_length=35, verbose_name='номер телефона', **NULLABLE)
-    verification_key = models.CharField(max_length=150, verbose_name='ключ', **NULLABLE)
+    phone = models.CharField(max_length=35, verbose_name='номер телефона',
+                             **NULLABLE)
+    verification_key = models.CharField(max_length=150, verbose_name='ключ',
+                                        **NULLABLE)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

@@ -1,9 +1,12 @@
-from django.views.generic import ListView, UpdateView, DeleteView, CreateView, TemplateView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import ListView, UpdateView, DeleteView, \
+    CreateView, TemplateView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin, \
+    PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, Http404
 
-from mailings.forms import ContactForm, ClientForm, MailSettingsForm, MailSettingsChangeStatus, MessageForm
+from mailings.forms import ContactForm, ClientForm, MailSettingsForm, \
+    MailSettingsChangeStatus, MessageForm
 from mailings.models import Client, MailSettings, Message, Logs
 from mailings.services import my_job, get_cached_data, get_random_blog
 
@@ -46,9 +49,10 @@ class ContactFormView(FormView):
         return redirect('/')
 
 
-#################################################################################
+###############################################################################
 class ClientListView(LoginRequiredMixin, ListView):
-    """ Список клиентов, доступны к просмотру клиенты, созданные пользователем """
+    """ Список клиентов, доступны к просмотру клиенты, созданные
+    пользователем"""
 
     model = Client
 
@@ -75,7 +79,8 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
 
 
 class ClientUpdateView(LoginRequiredMixin, UpdateView):
-    """ Редактирование клиента, доступны к редактированию клиенты, созданные пользователем """
+    """ Редактирование клиента, доступны к редактированию клиенты, созданные
+    пользователем"""
 
     model = Client
     form_class = ClientForm
@@ -88,13 +93,14 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
-    """ Удаление клиента, доступны к удалению клиенты, созданные пользователем """
+    """ Удаление клиента, доступны к удалению клиенты, созданные
+    пользователем"""
 
     model = Client
     success_url = reverse_lazy('mailings:clients')
 
 
-#################################################################################
+###############################################################################
 class MailSettingsListView(LoginRequiredMixin, ListView):
     """ Список рассылок, созданных пользователем """
 
@@ -107,7 +113,8 @@ class MailSettingsListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class MailSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class MailSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin,
+                             CreateView):
     """ Создание рассылки """
 
     model = MailSettings
@@ -118,7 +125,8 @@ class MailSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin, Create
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         if not self.request.user.is_superuser:
-            form.fields['client'].queryset = Client.objects.filter(user=self.request.user)
+            form.fields['client'].queryset = Client.objects.filter(
+                user=self.request.user)
         else:
             form.fields['client'].queryset = Client.objects.all()
         return form
@@ -132,8 +140,10 @@ class MailSettingsCreateView(LoginRequiredMixin, PermissionRequiredMixin, Create
         return super().form_valid(form)
 
 
-class MailSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    """ Редактирование рассылки, доступны к редактированию рассылки, созданные пользователем """
+class MailSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
+                             UpdateView):
+    """ Редактирование рассылки, доступны к редактированию рассылки,
+    созданные пользователем"""
 
     model = MailSettings
     form_class = MailSettingsForm
@@ -148,7 +158,8 @@ class MailSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
         return self.object
 
 
-class MailSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MailSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin,
+                             DeleteView):
     """ Удаление рассылки """
 
     model = MailSettings
@@ -163,14 +174,15 @@ class MailSettingsDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Delete
         return context_data
 
 
-class StatusMailingSettingsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class StatusMailingSettingsUpdateView(LoginRequiredMixin,
+                                      PermissionRequiredMixin, UpdateView):
     model = MailSettings
     form_class = MailSettingsChangeStatus
     success_url = reverse_lazy('mailings:list')
     permission_required = 'mailings.set_status'
 
 
-#################################################################################
+###############################################################################
 class MessageListView(LoginRequiredMixin, ListView):
     """ Список сообщений, доступно для использования всем """
 
@@ -185,7 +197,8 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('mailings:message_list')
 
 
-class MessageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class MessageUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
+                        UpdateView):
     """ Редактирование сообщения для рассылок """
 
     model = Message
@@ -194,7 +207,8 @@ class MessageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
     success_url = reverse_lazy('mailings:message_list')
 
 
-class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin,
+                        DeleteView):
     """ Удаление сообщения для рассылок """
 
     model = Message
@@ -202,7 +216,7 @@ class MessageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     success_url = reverse_lazy('mailings:message_list')
 
 
-#################################################################################
+###############################################################################
 class MailingLogListView(LoginRequiredMixin, ListView):
     """ Список логов по рассылке """
 
@@ -210,10 +224,13 @@ class MailingLogListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
-        queryset = Logs.objects.filter(mailings=self.kwargs.get('pk')).order_by('-last_try')
+        queryset = Logs.objects.filter(
+            mailings=self.kwargs.get('pk')).order_by(
+            '-last_try')
         return queryset
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data['mailings'] = MailSettings.objects.get(pk=self.kwargs.get('pk'))
+        context_data['mailings'] = MailSettings.objects.get(
+            pk=self.kwargs.get('pk'))
         return context_data
